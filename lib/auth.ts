@@ -30,22 +30,37 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials, request) {
         const parsed = loginSchema.safeParse(credentials);
-        if (!parsed.success) throw new Error("VALIDATION_FAILED");
+        if (!parsed.success) {
+          console.warn("AUTH_LOGIN_VALIDATION_FAILED");
+          throw new Error("VALIDATION_FAILED");
+        }
 
         const forwarded = request?.headers?.["x-forwarded-for"];
         const realIp = request?.headers?.["x-real-ip"];
         const ip = Array.isArray(forwarded) ? forwarded[0] : forwarded || realIp || "unknown";
         const rate = await applyRateLimitByKey(`login:${ip}:${parsed.data.email.toLowerCase()}`, 10, 60);
-        if (!rate.success) throw new Error("TOO_MANY_REQUESTS");
+        if (!rate.success) {
+          console.warn("AUTH_LOGIN_RATE_LIMITED");
+          throw new Error("TOO_MANY_REQUESTS");
+        }
 
         const captchaOk = await verifyRecaptchaToken(parsed.data.captchaToken);
-        if (!captchaOk) throw new Error("CAPTCHA_FAILED");
+        if (!captchaOk) {
+          console.warn("AUTH_LOGIN_CAPTCHA_FAILED");
+          throw new Error("CAPTCHA_FAILED");
+        }
 
         const user = await prisma.user.findUnique({ where: { email: parsed.data.email.toLowerCase() } });
-        if (!user) throw new Error("INVALID_CREDENTIALS");
+        if (!user) {
+          console.warn("AUTH_LOGIN_USER_NOT_FOUND");
+          throw new Error("INVALID_CREDENTIALS");
+        }
 
         const valid = await bcrypt.compare(parsed.data.password, user.passwordHash);
-        if (!valid) throw new Error("INVALID_CREDENTIALS");
+        if (!valid) {
+          console.warn("AUTH_LOGIN_BAD_PASSWORD");
+          throw new Error("INVALID_CREDENTIALS");
+        }
 
         return {
           id: user.id,

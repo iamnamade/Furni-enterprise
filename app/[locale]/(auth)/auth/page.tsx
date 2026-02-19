@@ -10,6 +10,14 @@ import { PasswordStrength } from "@/components/auth/password-strength";
 import { Input } from "@/components/ui/input";
 import { getRecaptchaToken } from "@/lib/recaptcha-client";
 
+const ERROR_MAP: Record<string, string> = {
+  INVALID_CREDENTIALS: "invalidCredentials",
+  TOO_MANY_REQUESTS: "tooManyRequests",
+  CAPTCHA_FAILED: "captchaFailed",
+  VALIDATION_FAILED: "invalidCredentials",
+  CredentialsSignin: "invalidCredentials"
+};
+
 export default function AuthEntryPage({ params }: { params: { locale: string } }) {
   const tAuth = useTranslations("auth");
   const tCommon = useTranslations("common");
@@ -34,7 +42,8 @@ export default function AuthEntryPage({ params }: { params: { locale: string } }
     });
     setLoading(false);
     if (result?.error) {
-      setError(tAuth("invalidCredentials"));
+      const key = ERROR_MAP[result.error] || "invalidCredentials";
+      setError(tAuth(key));
       return;
     }
     window.location.assign(result?.url || `/${params.locale}/account`);
