@@ -5,7 +5,6 @@ import { z } from "zod";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,7 +30,6 @@ const ERROR_MAP: Record<string, string> = {
 export default function LoginPage({ params }: { params: { locale: string } }) {
   const t = useTranslations("auth");
   const pick = (en: string, ka: string, ru: string) => (params.locale === "ka" ? ka : params.locale === "ru" ? ru : en);
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState("");
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -56,7 +54,8 @@ export default function LoginPage({ params }: { params: { locale: string } }) {
       email: values.email,
       password: values.password,
       captchaToken,
-      redirect: false
+      redirect: false,
+      callbackUrl: `/${params.locale}/account`
     });
 
     if (result?.error) {
@@ -65,8 +64,8 @@ export default function LoginPage({ params }: { params: { locale: string } }) {
       return;
     }
 
-    router.push(`/${params.locale}`);
-    router.refresh();
+    const target = result?.url || `/${params.locale}/account`;
+    window.location.assign(target);
   }
 
   return (

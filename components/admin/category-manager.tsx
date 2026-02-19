@@ -90,11 +90,11 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <Button onClick={startCreate}>{pick("Create category", "კატეგორიის დამატება", "Создать категорию")}</Button>
+      <div className="flex">
+        <Button onClick={startCreate} className="w-full sm:ml-auto sm:w-auto">{pick("Create category", "კატეგორიის დამატება", "Создать категорию")}</Button>
       </div>
-      <div className="overflow-hidden rounded-2xl border border-brand-primary/15">
-        <table className="w-full border-collapse text-sm">
+      <div className="overflow-x-auto rounded-2xl border border-brand-primary/15">
+        <table className="w-full min-w-[760px] border-collapse text-sm">
           <thead className="bg-brand-primary/8 text-left">
             <tr>
               <th className="px-4 py-3">{pick("Name", "სახელი", "Название")}</th>
@@ -110,7 +110,7 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
                 <td className="px-4 py-3">{category.slug}</td>
                 <td className="px-4 py-3">{category.description || "-"}</td>
                 <td className="px-4 py-3">
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Button variant="ghost" onClick={() => startEdit(category)}>
                       {pick("Edit", "რედაქტირება", "Редактировать")}
                     </Button>

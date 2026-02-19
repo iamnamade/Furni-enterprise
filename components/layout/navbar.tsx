@@ -13,11 +13,11 @@ import {
   Search,
   ShoppingBag,
   Store,
+  Heart,
   User,
-  UserPlus,
   X
 } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "@/lib/motion";
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -28,12 +28,12 @@ import { BrandLogo } from "./brand-logo";
 import { MiniCartOverlay } from "./mini-cart-overlay";
 import { useCartStore } from "@/lib/zustand-cart";
 import { Button } from "@/components/ui/button";
-import { AuthModal } from "@/components/auth/auth-modal";
+import { localizeCategoryName } from "@/lib/product-i18n";
 
 const SEARCH_SUGGESTIONS = ["Sofa", "Dining Table", "Lounge Chair", "Oak Collection", "Desk", "Storage"];
 const CATEGORY_GROUPS = {
-  byRoom: ["living-room", "bedroom", "dining-room", "outdoor", "home-office"],
-  byType: ["soft-furniture", "beds", "chairs-armchairs", "tables"]
+  byRoom: ["living-room", "bedroom", "dining-tables", "outdoor", "office-furniture"],
+  byType: ["sofas", "armchairs", "chairs", "coffee-tables", "dressers", "wardrobes"]
 };
 
 type NavbarProps = {
@@ -58,12 +58,14 @@ export function Navbar({ locale, categories }: NavbarProps) {
   const [open, setOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false);
+  const [desktopCategoryOpen, setDesktopCategoryOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const [authOpen, setAuthOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const closeCartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const accountRef = useRef<HTMLDivElement | null>(null);
+  const desktopCategoryRef = useRef<HTMLDivElement | null>(null);
+  const desktopCategoryButtonRef = useRef<HTMLButtonElement | null>(null);
   const prevCountRef = useRef(count);
   const didInitCartEffectRef = useRef(false);
 
@@ -113,6 +115,57 @@ export function Navbar({ locale, categories }: NavbarProps) {
   }, []);
 
   useEffect(() => {
+    function onClickOutside(event: MouseEvent) {
+      if (!desktopCategoryRef.current) return;
+      if (!desktopCategoryRef.current.contains(event.target as Node)) {
+        setDesktopCategoryOpen(false);
+      }
+    }
+
+    function onEsc(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setDesktopCategoryOpen(false);
+        desktopCategoryButtonRef.current?.focus();
+      }
+    }
+
+    document.addEventListener("mousedown", onClickOutside);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("mousedown", onClickOutside);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!desktopCategoryOpen || !desktopCategoryRef.current) return;
+
+    const panel = desktopCategoryRef.current;
+    const focusables = Array.from(
+      panel.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')
+    );
+    if (focusables.length === 0) return;
+
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    first.focus();
+
+    function onKeydown(event: KeyboardEvent) {
+      if (event.key !== "Tab") return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    panel.addEventListener("keydown", onKeydown);
+    return () => panel.removeEventListener("keydown", onKeydown);
+  }, [desktopCategoryOpen]);
+
+  useEffect(() => {
     if (pathname.includes("/shop")) {
       const query = new URLSearchParams(window.location.search).get("search") || "";
       setSearch(query);
@@ -127,8 +180,9 @@ export function Navbar({ locale, categories }: NavbarProps) {
   ];
 
   const accountLinks = [
-    ...(session?.user ? [{ href: `/${locale}/profile`, label: tAccount("profile") }] : []),
+    ...(session?.user ? [{ href: `/${locale}/account`, label: tAccount("profile") }] : []),
     ...(session?.user ? [{ href: `/${locale}/orders`, label: tNav("orders") }] : []),
+    ...(session?.user ? [{ href: `/${locale}/favorites`, label: tAccount.has("wishlist") ? tAccount("wishlist") : "Favorites" }] : []),
     ...(session?.user?.role === "ADMIN" ? [{ href: `/${locale}/admin`, label: tNav("admin") }] : [])
   ];
 
@@ -196,15 +250,24 @@ export function Navbar({ locale, categories }: NavbarProps) {
   const mobileNav = [
     { href: `/${locale}`, label: tNav("home"), icon: House },
     { href: `/${locale}/shop`, label: tNav("shop"), icon: Store },
+    { href: `/${locale}/favorites`, label: tNav.has("favorites") ? tNav("favorites") : "Favorites", icon: Heart },
     { href: `/${locale}/about`, label: tNav("about"), icon: Info },
     { href: `/${locale}/contact`, label: tNav("contact"), icon: Mail }
   ];
+
+  const mobileAccountNav = session?.user
+    ? [
+        { href: `/${locale}/account`, label: tAccount("profile"), icon: User },
+        { href: `/${locale}/orders`, label: tNav("orders"), icon: ShoppingBag },
+        ...(session.user.role === "ADMIN" ? [{ href: `/${locale}/admin`, label: tNav("admin"), icon: Grid3X3 }] : [])
+      ]
+    : [];
 
   return (
     <header className="sticky top-0 z-50 border-b bg-[color:var(--nav-bg)] backdrop-blur-xl">
       <div className="container-shell flex h-20 items-center justify-between gap-4">
         <Link href={`/${locale}`} aria-label={tCommon("brand")} className="shrink-0">
-          <BrandLogo name={tCommon("brand")} priority imageClassName="h-14 sm:h-16" />
+          <BrandLogo name={tCommon("brand")} priority imageClassName="h-16 sm:h-20" />
         </Link>
 
         <nav aria-label="Primary" className="hidden items-center gap-5 text-sm md:flex">
@@ -213,43 +276,64 @@ export function Navbar({ locale, categories }: NavbarProps) {
               {link.label}
             </Link>
           ))}
-          <details className="group relative">
-            <summary className="list-none cursor-pointer text-[color:var(--muted)] transition hover:text-[color:var(--foreground)]">
+          <div className="relative" ref={desktopCategoryRef}>
+            <button
+              ref={desktopCategoryButtonRef}
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={desktopCategoryOpen}
+              onClick={() => setDesktopCategoryOpen((value) => !value)}
+              className="inline-flex items-center gap-1 text-[color:var(--muted)] transition hover:text-[color:var(--foreground)]"
+            >
               {tNav("categories")}
-            </summary>
-            <div className="glass-panel absolute left-0 top-8 z-30 w-[520px] p-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted)]">{byRoomLabel}</p>
-                  <div className="space-y-1">
-                    {groupedCategories.byRoom.map((category) => (
-                      <Link
-                        key={category.id}
-                        href={`/${locale}/shop?category=${category.slug}`}
-                        className="block rounded-xl px-3 py-2 text-sm hover:bg-[color:var(--surface-strong)]"
-                      >
-                        {category.name}
-                      </Link>
-                    ))}
+              <ChevronDown className={`h-4 w-4 transition ${desktopCategoryOpen ? "rotate-180" : ""}`} />
+            </button>
+            <AnimatePresence initial={false}>
+              {desktopCategoryOpen ? (
+                <motion.div
+                  role="menu"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
+                  transition={{ duration: 0.24, ease: "easeInOut" }}
+                  className="absolute left-0 top-full z-40 mt-3 w-[560px] rounded-2xl border border-[color:var(--glass-border)] bg-[#f3e3c9] p-4 text-[#102c26] shadow-[0_18px_45px_rgba(16,44,38,0.22)] dark:bg-[#173a33] dark:text-[#f7e7ce]"
+                >
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted)]">{byRoomLabel}</p>
+                      <div className="space-y-1">
+                        {groupedCategories.byRoom.map((category) => (
+                          <Link
+                            key={category.id}
+                            href={`/${locale}/category/${category.slug}`}
+                            onClick={() => setDesktopCategoryOpen(false)}
+                            className="block rounded-xl px-3 py-2 text-sm hover:bg-[color:var(--surface-strong)]"
+                          >
+                        {localizeCategoryName(category.slug, category.name, locale)}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted)]">{byTypeLabel}</p>
+                      <div className="space-y-1">
+                        {groupedCategories.byType.map((category) => (
+                          <Link
+                            key={category.id}
+                            href={`/${locale}/category/${category.slug}`}
+                            onClick={() => setDesktopCategoryOpen(false)}
+                            className="block rounded-xl px-3 py-2 text-sm hover:bg-[color:var(--surface-strong)]"
+                          >
+                            {localizeCategoryName(category.slug, category.name, locale)}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted)]">{byTypeLabel}</p>
-                  <div className="space-y-1">
-                    {groupedCategories.byType.map((category) => (
-                      <Link
-                        key={category.id}
-                        href={`/${locale}/shop?category=${category.slug}`}
-                        className="block rounded-xl px-3 py-2 text-sm hover:bg-[color:var(--surface-strong)]"
-                      >
-                        {category.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </details>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </div>
         </nav>
 
         <div className="relative hidden flex-1 md:flex md:max-w-xl">
@@ -320,14 +404,14 @@ export function Navbar({ locale, categories }: NavbarProps) {
               aria-label={session?.user ? tAccount("profile") : tCommon("signIn")}
               onClick={() => {
                 if (!session?.user) {
-                  setAuthOpen(true);
+                  router.push(`/${locale}/auth`);
                   return;
                 }
                 if (session.user.role === "ADMIN") {
                   setAccountOpen((value) => !value);
                   return;
                 }
-                router.push(`/${locale}/profile`);
+                router.push(`/${locale}/account`);
               }}
             >
               <User className="h-4 w-4" />
@@ -428,16 +512,16 @@ export function Navbar({ locale, categories }: NavbarProps) {
                     );
                   })}
 
-                  <button type="button" className={mobileItemClass} onClick={() => setCategoryOpen((v) => !v)}>
+                  <button type="button" className={mobileItemClass} onClick={() => setMobileCategoryOpen((v) => !v)}>
                     <span className="inline-flex items-center gap-3">
                       <Grid3X3 className="h-4 w-4" />
                       <span>{tNav("categories")}</span>
                     </span>
-                    <ChevronDown className={`h-4 w-4 transition ${categoryOpen ? "rotate-180" : ""}`} />
+                    <ChevronDown className={`h-4 w-4 transition ${mobileCategoryOpen ? "rotate-180" : ""}`} />
                   </button>
 
                   <AnimatePresence initial={false}>
-                    {categoryOpen ? (
+                    {mobileCategoryOpen ? (
                       <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
@@ -445,27 +529,27 @@ export function Navbar({ locale, categories }: NavbarProps) {
                         transition={{ duration: 0.28, ease: "easeInOut" }}
                         className="overflow-hidden"
                       >
-                        <div className="space-y-2 rounded-2xl border border-[color:var(--control-border)] bg-white/70 p-3 dark:bg-[#15362f]">
+                        <div className="space-y-2 rounded-2xl border border-[color:var(--control-border)] bg-[#f3e3c9] p-3 dark:bg-[#15362f]">
                           <p className="px-3 pt-1 text-[11px] font-semibold uppercase tracking-wider text-[color:var(--muted)]">{byRoomLabel}</p>
                           {groupedCategories.byRoom.map((category) => (
                             <Link
                               key={category.id}
-                              href={`/${locale}/shop?category=${category.slug}`}
+                              href={`/${locale}/category/${category.slug}`}
                               className="block rounded-xl px-3 py-2 text-sm text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-strong)]"
                               onClick={() => setOpen(false)}
                             >
-                              {category.name}
+                              {localizeCategoryName(category.slug, category.name, locale)}
                             </Link>
                           ))}
                           <p className="px-3 pt-2 text-[11px] font-semibold uppercase tracking-wider text-[color:var(--muted)]">{byTypeLabel}</p>
                           {groupedCategories.byType.map((category) => (
                             <Link
                               key={category.id}
-                              href={`/${locale}/shop?category=${category.slug}`}
+                              href={`/${locale}/category/${category.slug}`}
                               className="block rounded-xl px-3 py-2 text-sm text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-strong)]"
                               onClick={() => setOpen(false)}
                             >
-                              {category.name}
+                              {localizeCategoryName(category.slug, category.name, locale)}
                             </Link>
                           ))}
                         </div>
@@ -502,19 +586,29 @@ export function Navbar({ locale, categories }: NavbarProps) {
                     )}
                   </button>
 
+                  {session?.user ? (
+                    <>
+                      {mobileAccountNav.map((link) => {
+                        const Icon = link.icon;
+                        return (
+                          <Link key={link.href} href={link.href} className={mobileItemClass} onClick={() => setOpen(false)}>
+                            <span className="inline-flex items-center gap-3">
+                              <Icon className="h-4 w-4" />
+                              <span>{link.label}</span>
+                            </span>
+                            <ChevronRight className="h-4 w-4 opacity-60 transition group-hover:translate-x-0.5" />
+                          </Link>
+                        );
+                      })}
+                    </>
+                  ) : null}
+
                   {!session?.user ? (
                     <>
-                      <Link href={`/${locale}/login`} className={mobileItemClass} onClick={() => setOpen(false)}>
+                      <Link href={`/${locale}/auth`} className={mobileItemClass} onClick={() => setOpen(false)}>
                         <span className="inline-flex items-center gap-3">
                           <LogIn className="h-4 w-4" />
-                          <span>{tNav("login")}</span>
-                        </span>
-                        <ChevronRight className="h-4 w-4 opacity-60" />
-                      </Link>
-                      <Link href={`/${locale}/register`} className={mobileItemClass} onClick={() => setOpen(false)}>
-                        <span className="inline-flex items-center gap-3">
-                          <UserPlus className="h-4 w-4" />
-                          <span>{tNav("register")}</span>
+                          <span>{tCommon("signIn")}</span>
                         </span>
                         <ChevronRight className="h-4 w-4 opacity-60" />
                       </Link>
@@ -568,11 +662,12 @@ export function Navbar({ locale, categories }: NavbarProps) {
         decreaseLabel={tCommon("decreaseQuantity")}
         increaseLabel={tCommon("increaseQuantity")}
         removeLabel={tCommon("remove")}
+        continueShoppingLabel={tNav("shopNowCta")}
+        favoritesLabel={tNav.has("favorites") ? tNav("favorites") : "Favorites"}
         onClose={() => setCartOpen(false)}
         onRemove={removeItem}
         onUpdateQty={updateQty}
       />
-      <AuthModal open={authOpen} locale={locale} onClose={() => setAuthOpen(false)} />
     </header>
   );
 }

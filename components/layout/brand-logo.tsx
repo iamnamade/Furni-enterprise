@@ -18,6 +18,7 @@ export function BrandLogo({ name, className, imageClassName, priority = false, s
         width={420}
         height={220}
         priority={priority}
+        sizes="(max-width: 640px) 160px, 220px"
         className={cn("h-14 w-auto object-contain", imageClassName)}
       />
       {showName ? <span className="text-base font-semibold tracking-[-0.03em] text-[color:var(--foreground)]">{name}</span> : null}

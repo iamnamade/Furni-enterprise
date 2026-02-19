@@ -184,7 +184,7 @@ export function ProfileForm({ initial, locale }: ProfileFormProps) {
       </div>
 
       <div className="surface-card flex flex-wrap items-center justify-between gap-3 p-6">
-        <Link href={`/${locale}/shop`} className="link-underline text-sm text-brand-secondary">
+        <Link href={`/${locale}/favorites`} className="link-underline text-sm text-brand-secondary">
           {tr("wishlist", "Wishlist/Favorites")}
         </Link>
         <Button variant="danger" onClick={() => signOut({ callbackUrl: `/${locale}` })}>

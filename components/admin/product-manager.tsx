@@ -268,13 +268,53 @@ export function ProductManager({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Input placeholder={tr("search", pick("Search products", "პროდუქტების ძებნა", "Поиск товаров"))} className="max-w-sm" value={query} onChange={(event) => setQuery(event.target.value)} />
-        <Button onClick={openCreate}>{tr("create", pick("Create product", "პროდუქტის დამატება", "Создать товар"))}</Button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <Input placeholder={tr("search", pick("Search products", "პროდუქტების ძებნა", "Поиск товаров"))} className="w-full sm:max-w-sm" value={query} onChange={(event) => setQuery(event.target.value)} />
+        <Button onClick={openCreate} className="w-full sm:w-auto">{tr("create", pick("Create product", "პროდუქტის დამატება", "Создать товар"))}</Button>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-brand-primary/15">
-        <table className="w-full border-collapse text-sm">
+      <div className="space-y-3 md:hidden">
+        {filtered.map((product) => (
+          <article key={`mobile-${product.id}`} className="rounded-2xl border border-brand-primary/15 bg-[color:var(--surface)] p-4">
+            <h3 className="text-base font-semibold">{product.name}</h3>
+            <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
+              <div>
+                <dt className="text-xs text-muted">{tr("table.category", pick("Category", "áƒ™áƒáƒ¢áƒ”áƒ’áƒáƒ áƒ˜áƒ", "ÐšÐ°Ñ‚ÐµÐ³Ð¾Ñ€Ð¸Ñ"))}</dt>
+                <dd>{localizedCategoryName(categories.find((entry) => entry.id === product.categoryId)?.slug || "", product.categoryName)}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted">{tr("table.price", pick("Price", "áƒ¤áƒáƒ¡áƒ˜", "Ð¦ÐµÐ½Ð°"))}</dt>
+                <dd>${product.price.toFixed(2)}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted">{tr("table.discount", pick("Discount", "áƒ¤áƒáƒ¡áƒ“áƒáƒ™áƒšáƒ”áƒ‘áƒ", "Ð¡ÐºÐ¸Ð´ÐºÐ°"))}</dt>
+                <dd>{product.discountPct}%</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted">{tr("table.stock", pick("Stock", "áƒ›áƒáƒ áƒáƒ’áƒ˜", "ÐžÑÑ‚Ð°Ñ‚Ð¾Ðº"))}</dt>
+                <dd>{product.stock}</dd>
+              </div>
+            </dl>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <Button variant="ghost" onClick={() => openEdit(product)}>
+                {tr("edit", pick("Edit", "áƒ áƒ”áƒ“áƒáƒ¥áƒ¢áƒ˜áƒ áƒ”áƒ‘áƒ", "Ð ÐµÐ´Ð°ÐºÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ"))}
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => {
+                  setDeletingId(product.id);
+                  setOpenDelete(true);
+                }}
+              >
+                {tCommon("remove")}
+              </Button>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div className="hidden overflow-x-auto rounded-2xl border border-brand-primary/15 md:block">
+        <table className="w-full min-w-[860px] border-collapse text-sm">
           <thead className="bg-brand-primary/8 text-left">
             <tr>
               <th className="px-4 py-3">{tr("table.name", pick("Name", "სახელი", "Название"))}</th>
@@ -296,7 +336,7 @@ export function ProductManager({
                 <td className="px-4 py-3">{product.discountPct}%</td>
                 <td className="px-4 py-3">{product.stock}</td>
                 <td className="px-4 py-3">
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Button variant="ghost" onClick={() => openEdit(product)}>
                       {tr("edit", pick("Edit", "რედაქტირება", "Редактировать"))}
                     </Button>
@@ -322,9 +362,9 @@ export function ProductManager({
         title={editingId ? tr("editProduct", pick("Edit product", "პროდუქტის რედაქტირება", "Редактировать товар")) : tr("createProduct", pick("Create product", "პროდუქტის დამატება", "Создать товар"))}
         onClose={() => setOpenForm(false)}
         closeLabel={tr("close", "Close")}
-        variant="bottom-sheet"
+        variant="center"
       >
-        <div className="space-y-3">
+        <div className="max-h-[70vh] space-y-3 overflow-y-auto pr-1">
           <Input
             placeholder={tr("fields.name", "Name")}
             className="border-0 bg-[#F5F5F5] text-[#102c26] placeholder:text-[#567267]"
@@ -338,7 +378,7 @@ export function ProductManager({
             }
           />
           <Input
-            placeholder={tr("fields.slug", "Slug")}
+            placeholder={tr("fields.slug", pick("Slug", "სლაგი", "Слаг"))}
             className="border-0 bg-[#F5F5F5] text-[#102c26] placeholder:text-[#567267]"
             value={form.slug}
             onChange={(event) => setForm((state) => ({ ...state, slug: event.target.value }))}
@@ -397,12 +437,12 @@ export function ProductManager({
             />
           </div>
           <select
-            className="h-11 w-full rounded-2xl border border-brand-primary/20 bg-[color:var(--surface)] px-3 text-sm"
+            className="h-11 w-full rounded-2xl border border-[#b8c7c0] bg-[#F5F5F5] px-3 text-sm text-[#102c26] dark:border-[#365a4a] dark:bg-[#203d33] dark:text-[#f5f5ef]"
             value={form.categoryId}
             onChange={(event) => setForm((state) => ({ ...state, categoryId: event.target.value }))}
           >
             {categories.map((category) => (
-              <option key={category.id} value={category.id}>
+              <option key={category.id} value={category.id} className="bg-white text-[#102c26] dark:bg-[#203d33] dark:text-[#f5f5ef]">
                 {localizedCategoryName(category.slug, category.name)}
               </option>
             ))}

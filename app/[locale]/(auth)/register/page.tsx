@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { z } from "zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
@@ -27,7 +27,6 @@ type FormValues = z.infer<typeof schema>;
 
 export default function RegisterPage({ params }: { params: { locale: string } }) {
   const t = useTranslations("auth");
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState("");
 
@@ -63,7 +62,16 @@ export default function RegisterPage({ params }: { params: { locale: string } })
       return;
     }
 
-    router.push(`/${params.locale}/login?registered=1`);
+    const loginCaptcha = await getRecaptchaToken("login");
+    const loginResult = await signIn("credentials", {
+      email: values.email,
+      password: values.password,
+      captchaToken: loginCaptcha,
+      redirect: false,
+      callbackUrl: `/${params.locale}/account`
+    });
+
+    window.location.assign(loginResult?.url || `/${params.locale}/account`);
   }
 
   return (

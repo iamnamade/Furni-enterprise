@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
     maxAge: 60 * 60 * 8
   },
   pages: {
-    signIn: "/login"
+    signIn: "/auth"
   },
   providers: [
     CredentialsProvider({

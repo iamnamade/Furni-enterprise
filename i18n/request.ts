@@ -11,11 +11,11 @@ const messagesByLocale = {
   ru
 };
 
-export default getRequestConfig(async ({ locale }) => {
-  const requestLocale = await locale;
+export default getRequestConfig(async ({ requestLocale }) => {
+  const resolvedRequestLocale = await requestLocale;
   const resolvedLocale =
-    requestLocale && locales.includes(requestLocale as (typeof locales)[number])
-      ? (requestLocale as (typeof locales)[number])
+    resolvedRequestLocale && locales.includes(resolvedRequestLocale as (typeof locales)[number])
+      ? (resolvedRequestLocale as (typeof locales)[number])
       : undefined;
 
   if (!resolvedLocale) {

@@ -6,6 +6,7 @@ type Toast = {
   id: string;
   title: string;
   message?: string;
+  href?: string;
 };
 
 type ToastState = {

@@ -1,7 +1,6 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { usePathname, useSearchParams } from "next/navigation";
 
 export function RouteProgress() {
@@ -29,18 +28,13 @@ export function RouteProgress() {
     };
   }, [pathname, search]);
 
+  if (!visible) return null;
+
   return (
-    <AnimatePresence>
-      {visible ? (
-        <motion.div
-          className="pointer-events-none fixed inset-x-0 top-0 z-[120] h-[3px] origin-left bg-brand-secondary shadow-[0_0_22px_rgba(247,231,206,0.75)]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1, scaleX: progress / 100 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.24, ease: "easeOut" }}
-        />
-      ) : null}
-    </AnimatePresence>
+    <div
+      className="pointer-events-none fixed inset-x-0 top-0 z-[120] h-[3px] origin-left bg-brand-secondary shadow-[0_0_22px_rgba(247,231,206,0.75)] transition-[transform,opacity] duration-200 ease-out"
+      style={{ transform: `scaleX(${progress / 100})`, opacity: 1 }}
+      aria-hidden="true"
+    />
   );
 }
-

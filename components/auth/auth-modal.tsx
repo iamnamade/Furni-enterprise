@@ -1,10 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { PasswordStrength } from "@/components/auth/password-strength";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { getRecaptchaToken } from "@/lib/recaptcha-client";
@@ -26,7 +27,6 @@ export function AuthModal({ open, locale, onClose }: AuthModalProps) {
   const tAuth = useTranslations("auth");
   const tCommon = useTranslations("common");
   const pick = (en: string, ka: string, ru: string) => (locale === "ka" ? ka : locale === "ru" ? ru : en);
-  const router = useRouter();
   const [tab, setTab] = useState<"login" | "register">("login");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -42,7 +42,8 @@ export function AuthModal({ open, locale, onClose }: AuthModalProps) {
       email: loginForm.email,
       password: loginForm.password,
       captchaToken,
-      redirect: false
+      redirect: false,
+      callbackUrl: `/${locale}/account`
     });
 
     setLoading(false);
@@ -53,8 +54,7 @@ export function AuthModal({ open, locale, onClose }: AuthModalProps) {
     }
 
     onClose();
-    router.push(`/${locale}/profile`);
-    router.refresh();
+    window.location.assign(result?.url || `/${locale}/account`);
   }
 
   async function handleRegister() {
@@ -76,16 +76,16 @@ export function AuthModal({ open, locale, onClose }: AuthModalProps) {
     }
 
     const loginCaptcha = await getRecaptchaToken("login");
-    await signIn("credentials", {
+    const loginResult = await signIn("credentials", {
       email: registerForm.email,
       password: registerForm.password,
       captchaToken: loginCaptcha,
-      redirect: false
+      redirect: false,
+      callbackUrl: `/${locale}/account`
     });
     setLoading(false);
     onClose();
-    router.push(`/${locale}/profile`);
-    router.refresh();
+    window.location.assign(loginResult?.url || `/${locale}/account`);
   }
 
   return (
@@ -122,6 +122,11 @@ export function AuthModal({ open, locale, onClose }: AuthModalProps) {
               value={loginForm.password}
               onChange={(event) => setLoginForm((state) => ({ ...state, password: event.target.value }))}
             />
+            <div className="flex justify-end">
+              <Link className="text-xs text-muted hover:underline" href={`/${locale}/forgot-password`}>
+                {tAuth("forgotPassword")}
+              </Link>
+            </div>
             <Button className="w-full" onClick={handleLogin} disabled={loading}>
               {loading ? tCommon("loading") : tAuth("login")}
             </Button>
@@ -145,6 +150,7 @@ export function AuthModal({ open, locale, onClose }: AuthModalProps) {
               value={registerForm.password}
               onChange={(event) => setRegisterForm((state) => ({ ...state, password: event.target.value }))}
             />
+            <PasswordStrength password={registerForm.password} />
             <Button className="w-full" onClick={handleRegister} disabled={loading}>
               {loading ? tCommon("loading") : tAuth("registerTitle")}
             </Button>

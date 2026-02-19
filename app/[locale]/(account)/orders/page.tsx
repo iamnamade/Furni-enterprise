@@ -19,12 +19,12 @@ export default async function OrderHistoryPage({ params }: { params: { locale: s
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="surface-card p-4">
-          <p className="text-xs uppercase tracking-wide text-white/70">{t("orders")}</p>
-          <p className="mt-1 text-2xl font-semibold text-brand-secondary">{orders.length}</p>
+          <p className="text-xs uppercase tracking-wide text-muted">{t("orders")}</p>
+          <p className="mt-1 text-2xl font-semibold text-brand-primary dark:text-brand-secondary">{orders.length}</p>
         </div>
         <div className="surface-card p-4 sm:col-span-2">
-          <p className="text-xs uppercase tracking-wide text-white/70">{t("totalSpent")}</p>
-          <p className="mt-1 text-2xl font-semibold text-brand-secondary">{currency(totalSpent)}</p>
+          <p className="text-xs uppercase tracking-wide text-muted">{t("totalSpent")}</p>
+          <p className="mt-1 text-2xl font-semibold text-brand-primary dark:text-brand-secondary">{currency(totalSpent)}</p>
         </div>
       </div>
       <h1 className="section-title">{t("orders")}</h1>

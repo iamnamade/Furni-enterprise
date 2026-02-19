@@ -58,7 +58,7 @@ export default function CartPage({ params }: { params: { locale: string } }) {
                   className="rounded-2xl border border-[color:var(--control-border)] bg-[color:var(--surface)] p-4 backdrop-blur-xl"
                 >
                   <div className="grid grid-cols-[88px_1fr_auto] gap-4">
-                    <Image src={item.imageUrl} alt={item.name} width={88} height={88} className="h-[88px] w-[88px] rounded-xl object-cover" />
+                    <Image src={item.imageUrl} alt={item.name} width={88} height={88} sizes="88px" className="h-[88px] w-[88px] rounded-xl object-cover" />
                     <div>
                       <p className="font-semibold">{item.name}</p>
                       <p className="text-sm text-[color:var(--muted)]">{currency(item.price)}</p>

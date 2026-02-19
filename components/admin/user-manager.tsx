@@ -40,8 +40,8 @@ export function UserManager({ initialUsers }: { initialUsers: AdminUser[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-2xl border border-brand-primary/15">
-        <table className="w-full border-collapse text-sm">
+      <div className="overflow-x-auto rounded-2xl border border-brand-primary/15">
+        <table className="w-full min-w-[860px] border-collapse text-sm">
           <thead className="bg-brand-primary/8 text-left">
             <tr>
               <th className="px-4 py-3">Name</th>
@@ -71,4 +71,3 @@ export function UserManager({ initialUsers }: { initialUsers: AdminUser[] }) {
     </div>
   );
 }
-

@@ -31,6 +31,8 @@
     "register": "Register",
     "shopNowCta": "Shop now",
     "viewCartCta": "View cart",
+    "favorites": "Favorites",
+    "emptyFavorites": "You have no favorite products yet.",
     "byRoom": "By room",
     "byProductType": "By product type"
   },
@@ -122,7 +124,14 @@
     "noProducts": "No products found",
     "adjustFilters": "Adjust filters to see more results.",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "updating": "Updating...",
+    "exactPrice": "Exact price",
+    "discountFilter": "Discount filter",
+    "allItems": "All items",
+    "discountedOnly": "Discounted only",
+    "applyFilters": "Apply filters",
+    "resetFilters": "Reset"
   },
   "cart": {
     "title": "Your cart",
@@ -141,7 +150,17 @@
     "details": "Details",
     "relatedProducts": "Related products",
     "inStock": "{count} in stock",
-    "outOfStock": "Out of stock"
+    "outOfStock": "Out of stock",
+    "freeDelivery": "Free white-glove delivery",
+    "ratingLabel": "4.9 rating (312)",
+    "detailsTitle": "Product details",
+    "detailsText": "Built with balanced proportions for modern interiors, engineered for daily comfort and durability.",
+    "materialsTitle": "Materials & care",
+    "materialsText": "Premium hardwood frame, performance fabric, and low-sheen finish. Clean with a soft cloth and mild soap.",
+    "shippingTitle": "Shipping & returns",
+    "shippingText": "Delivery in 3-7 business days in major regions. 30-day easy returns for unused products.",
+    "qualityNote": "Crafted premium finish, protected packaging, and insured delivery included.",
+    "addedToCart": "Added to cart"
   },
   "account": {
     "dashboard": "My account",
@@ -181,7 +200,8 @@
     "date": "Date",
     "itemsLabel": "Items",
     "totalLabel": "Total",
-    "status": "Status"
+    "status": "Status",
+    "noOrdersYet": "No orders yet"
   },
   "admin": {
     "panel": "Admin panel",
@@ -283,5 +303,327 @@
     "description": "For custom interior projects, product questions, and delivery details, our team is available every day.",
     "emailLabel": "Email",
     "phoneLabel": "Phone"
+  },
+  "catalog": {
+    "categories": {
+      "sofas": {
+        "name": "Sofas",
+        "description": "Comfort-first sofas for contemporary living spaces."
+      },
+      "armchairs": {
+        "name": "Armchairs",
+        "description": "Accent and lounge armchairs with ergonomic form."
+      },
+      "coffee-tables": {
+        "name": "Coffee Tables",
+        "description": "Low-profile coffee tables in wood, glass and stone."
+      },
+      "dining-tables": {
+        "name": "Dining Tables",
+        "description": "Dining tables for daily family use and guests."
+      },
+      "chairs": {
+        "name": "Chairs",
+        "description": "Dining and multipurpose chairs with durable frames."
+      },
+      "dressers": {
+        "name": "Dressers",
+        "description": "Bedroom dressers for organized storage."
+      },
+      "wardrobes": {
+        "name": "Wardrobes",
+        "description": "Wardrobes with smart internal organization."
+      },
+      "office-furniture": {
+        "name": "Office Furniture",
+        "description": "Workspace desks and storage for productive routines."
+      },
+      "tv-stands": {
+        "name": "TV Stands",
+        "description": "Media units and TV stands with cable management."
+      },
+      "decorative-items": {
+        "name": "Decorative Items",
+        "description": "Mirrors, lamps and decorative pieces to complete the room."
+      },
+      "bedroom": {
+        "name": "Bedroom",
+        "description": "Bed frames and bedroom essentials with a calm visual language."
+      },
+      "living-room": {
+        "name": "Living Room",
+        "description": "Core living room furniture with a modern Scandinavian balance."
+      },
+      "outdoor": {
+        "name": "Outdoor",
+        "description": "Weather-ready furniture designed for terraces and gardens."
+      }
+    },
+    "products": {
+      "oslo-modular-sofa": {
+        "name": "Oslo Modular Sofa",
+        "description": "Premium sofa engineered for daily comfort and long-term durability."
+      },
+      "nordic-corner-sofa": {
+        "name": "Nordic Corner Sofa",
+        "description": "Premium sofa engineered for daily comfort and long-term durability."
+      },
+      "bergen-velvet-sofa": {
+        "name": "Bergen Velvet Sofa",
+        "description": "Premium sofa engineered for daily comfort and long-term durability."
+      },
+      "stockholm-two-seater": {
+        "name": "Stockholm Two-Seater",
+        "description": "Premium sofa engineered for daily comfort and long-term durability."
+      },
+      "arctic-linen-sofa": {
+        "name": "Arctic Linen Sofa",
+        "description": "Premium sofa engineered for daily comfort and long-term durability."
+      },
+      "fjord-chaise-sofa": {
+        "name": "Fjord Chaise Sofa",
+        "description": "Premium sofa engineered for daily comfort and long-term durability."
+      },
+      "helsinki-accent-chair": {
+        "name": "Helsinki Accent Chair",
+        "description": "Ergonomic armchair with balanced back support and premium upholstery."
+      },
+      "malmo-lounge-chair": {
+        "name": "Malmo Lounge Chair",
+        "description": "Ergonomic armchair with balanced back support and premium upholstery."
+      },
+      "astra-curved-armchair": {
+        "name": "Astra Curved Armchair",
+        "description": "Ergonomic armchair with balanced back support and premium upholstery."
+      },
+      "nord-oak-armchair": {
+        "name": "Nord Oak Armchair",
+        "description": "Ergonomic armchair with balanced back support and premium upholstery."
+      },
+      "aalto-swivel-chair": {
+        "name": "Aalto Swivel Chair",
+        "description": "Ergonomic armchair with balanced back support and premium upholstery."
+      },
+      "birka-reading-chair": {
+        "name": "Birka Reading Chair",
+        "description": "Ergonomic armchair with balanced back support and premium upholstery."
+      },
+      "luno-oak-coffee-table": {
+        "name": "Luno Oak Coffee Table",
+        "description": "Modern coffee table with practical storage and durable materials."
+      },
+      "vega-round-coffee-table": {
+        "name": "Vega Round Coffee Table",
+        "description": "Modern coffee table with practical storage and durable materials."
+      },
+      "sirius-marble-top-table": {
+        "name": "Sirius Marble Top Table",
+        "description": "Modern coffee table with practical storage and durable materials."
+      },
+      "linea-minimal-coffee-table": {
+        "name": "Linea Minimal Coffee Table",
+        "description": "Modern coffee table with practical storage and durable materials."
+      },
+      "norr-glass-coffee-table": {
+        "name": "Norr Glass Coffee Table",
+        "description": "Modern coffee table with practical storage and durable materials."
+      },
+      "mira-nesting-coffee-set": {
+        "name": "Mira Nesting Coffee Set",
+        "description": "Modern coffee table with practical storage and durable materials."
+      },
+      "aalto-dining-table": {
+        "name": "Aalto Dining Table",
+        "description": "Dining table built for everyday family use with premium finish."
+      },
+      "skye-extendable-dining-table": {
+        "name": "Skye Extendable Dining Table",
+        "description": "Dining table built for everyday family use with premium finish."
+      },
+      "osen-walnut-dining-table": {
+        "name": "Osen Walnut Dining Table",
+        "description": "Dining table built for everyday family use with premium finish."
+      },
+      "nordic-oak-family-table": {
+        "name": "Nordic Oak Family Table",
+        "description": "Dining table built for everyday family use with premium finish."
+      },
+      "arden-stone-dining-table": {
+        "name": "Arden Stone Dining Table",
+        "description": "Dining table built for everyday family use with premium finish."
+      },
+      "mila-compact-dining-table": {
+        "name": "Mila Compact Dining Table",
+        "description": "Dining table built for everyday family use with premium finish."
+      },
+      "milo-dining-chair": {
+        "name": "Milo Dining Chair",
+        "description": "Comfortable multipurpose chair with stable frame and supportive seat."
+      },
+      "haven-stackable-chair": {
+        "name": "Haven Stackable Chair",
+        "description": "Comfortable multipurpose chair with stable frame and supportive seat."
+      },
+      "skand-wood-chair": {
+        "name": "Skand Wood Chair",
+        "description": "Comfortable multipurpose chair with stable frame and supportive seat."
+      },
+      "linea-upholstered-chair": {
+        "name": "Linea Upholstered Chair",
+        "description": "Comfortable multipurpose chair with stable frame and supportive seat."
+      },
+      "nora-dining-chair": {
+        "name": "Nora Dining Chair",
+        "description": "Comfortable multipurpose chair with stable frame and supportive seat."
+      },
+      "vela-curved-chair": {
+        "name": "Vela Curved Chair",
+        "description": "Comfortable multipurpose chair with stable frame and supportive seat."
+      },
+      "nord-6-drawer-dresser": {
+        "name": "Nord 6-Drawer Dresser",
+        "description": "Storage dresser with soft-close drawers and durable premium fronts."
+      },
+      "elm-compact-commode": {
+        "name": "Elm Compact Commode",
+        "description": "Storage dresser with soft-close drawers and durable premium fronts."
+      },
+      "aria-white-dresser": {
+        "name": "Aria White Dresser",
+        "description": "Storage dresser with soft-close drawers and durable premium fronts."
+      },
+      "sage-oak-commode": {
+        "name": "Sage Oak Commode",
+        "description": "Storage dresser with soft-close drawers and durable premium fronts."
+      },
+      "bruno-wide-dresser": {
+        "name": "Bruno Wide Dresser",
+        "description": "Storage dresser with soft-close drawers and durable premium fronts."
+      },
+      "mira-bedroom-dresser": {
+        "name": "Mira Bedroom Dresser",
+        "description": "Storage dresser with soft-close drawers and durable premium fronts."
+      },
+      "fjord-sliding-wardrobe": {
+        "name": "Fjord Sliding Wardrobe",
+        "description": "Wardrobe with organized internal layout for clothes and accessories."
+      },
+      "haven-3-door-wardrobe": {
+        "name": "Haven 3-Door Wardrobe",
+        "description": "Wardrobe with organized internal layout for clothes and accessories."
+      },
+      "nordic-oak-wardrobe": {
+        "name": "Nordic Oak Wardrobe",
+        "description": "Wardrobe with organized internal layout for clothes and accessories."
+      },
+      "linea-mirror-wardrobe": {
+        "name": "Linea Mirror Wardrobe",
+        "description": "Wardrobe with organized internal layout for clothes and accessories."
+      },
+      "malm-closet-wardrobe": {
+        "name": "Malm Closet Wardrobe",
+        "description": "Wardrobe with organized internal layout for clothes and accessories."
+      },
+      "skye-compact-wardrobe": {
+        "name": "Skye Compact Wardrobe",
+        "description": "Wardrobe with organized internal layout for clothes and accessories."
+      },
+      "aero-office-desk": {
+        "name": "Aero Office Desk",
+        "description": "Office furniture designed for productive routines and daily comfort."
+      },
+      "nord-standing-desk": {
+        "name": "Nord Standing Desk",
+        "description": "Office furniture designed for productive routines and daily comfort."
+      },
+      "luna-workstation-desk": {
+        "name": "Luna Workstation Desk",
+        "description": "Office furniture designed for productive routines and daily comfort."
+      },
+      "haven-file-cabinet": {
+        "name": "Haven File Cabinet",
+        "description": "Office furniture designed for productive routines and daily comfort."
+      },
+      "focus-office-shelf": {
+        "name": "Focus Office Shelf",
+        "description": "Office furniture designed for productive routines and daily comfort."
+      },
+      "mira-home-office-set": {
+        "name": "Mira Home Office Set",
+        "description": "Office furniture designed for productive routines and daily comfort."
+      },
+      "linea-tv-stand": {
+        "name": "Linea TV Stand",
+        "description": "Media furniture with cable organization and clean Scandinavian aesthetics."
+      },
+      "nord-walnut-media-unit": {
+        "name": "Nord Walnut Media Unit",
+        "description": "Media furniture with cable organization and clean Scandinavian aesthetics."
+      },
+      "malm-floating-tv-console": {
+        "name": "Malm Floating TV Console",
+        "description": "Media furniture with cable organization and clean Scandinavian aesthetics."
+      },
+      "astra-compact-tv-stand": {
+        "name": "Astra Compact TV Stand",
+        "description": "Media furniture with cable organization and clean Scandinavian aesthetics."
+      },
+      "haven-media-cabinet": {
+        "name": "Haven Media Cabinet",
+        "description": "Media furniture with cable organization and clean Scandinavian aesthetics."
+      },
+      "skye-low-tv-unit": {
+        "name": "Skye Low TV Unit",
+        "description": "Media furniture with cable organization and clean Scandinavian aesthetics."
+      },
+      "aurora-floor-lamp": {
+        "name": "Aurora Floor Lamp",
+        "description": "Decor accents that add warmth and identity to any interior."
+      },
+      "bergen-wall-mirror": {
+        "name": "Bergen Wall Mirror",
+        "description": "Decor accents that add warmth and identity to any interior."
+      },
+      "nord-ceramic-vase": {
+        "name": "Nord Ceramic Vase",
+        "description": "Decor accents that add warmth and identity to any interior."
+      },
+      "luna-table-lamp": {
+        "name": "Luna Table Lamp",
+        "description": "Decor accents that add warmth and identity to any interior."
+      },
+      "skye-decorative-tray": {
+        "name": "Skye Decorative Tray",
+        "description": "Decor accents that add warmth and identity to any interior."
+      },
+      "fjord-framed-art-set": {
+        "name": "Fjord Framed Art Set",
+        "description": "Decor accents that add warmth and identity to any interior."
+      },
+      "aalto-walnut-bed": {
+        "name": "Aalto Walnut Bed",
+        "description": "Bedroom furniture with calm visual balance and robust construction."
+      },
+      "skye-upholstered-bed": {
+        "name": "Skye Upholstered Bed",
+        "description": "Bedroom furniture with calm visual balance and robust construction."
+      },
+      "nordic-queen-bed": {
+        "name": "Nordic Queen Bed",
+        "description": "Bedroom furniture with calm visual balance and robust construction."
+      },
+      "mira-storage-bed": {
+        "name": "Mira Storage Bed",
+        "description": "Bedroom furniture with calm visual balance and robust construction."
+      },
+      "bergen-platform-bed": {
+        "name": "Bergen Platform Bed",
+        "description": "Bedroom furniture with calm visual balance and robust construction."
+      },
+      "aria-oak-bed-frame": {
+        "name": "Aria Oak Bed Frame",
+        "description": "Bedroom furniture with calm visual balance and robust construction."
+      }
+    }
   }
 }

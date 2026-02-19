@@ -55,8 +55,8 @@ export function OrderManager({ initialOrders }: { initialOrders: AdminOrder[] })
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-2xl border border-brand-primary/15">
-        <table className="w-full border-collapse text-sm">
+      <div className="overflow-x-auto rounded-2xl border border-brand-primary/15">
+        <table className="w-full min-w-[980px] border-collapse text-sm">
           <thead className="bg-brand-primary/8 text-left">
             <tr>
               <th className="px-4 py-3">Order</th>
@@ -105,12 +105,11 @@ export function OrderManager({ initialOrders }: { initialOrders: AdminOrder[] })
           </tbody>
         </table>
       </div>
-      <div className="flex justify-end">
-        <Button variant="secondary" onClick={() => location.reload()}>
+      <div className="flex">
+        <Button variant="secondary" onClick={() => location.reload()} className="w-full sm:ml-auto sm:w-auto">
           Refresh
         </Button>
       </div>
     </div>
   );
 }
-

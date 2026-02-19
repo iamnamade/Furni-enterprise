@@ -7,6 +7,12 @@ import { verifyRecaptchaToken } from "@/lib/captcha";
 import { applyRateLimitByKey } from "@/lib/rate-limit";
 import { isPayloadTooLarge } from "@/lib/request-guard";
 
+function getEmailExistsMessage(locale: string) {
+  if (locale === "ka") return "ამ ელფოსტით უკვე არსებობს ანგარიში.";
+  if (locale === "ru") return "Аккаунт с этой электронной почтой уже существует.";
+  return "An account with this email already exists.";
+}
+
 export async function POST(request: Request) {
   try {
     if (!isValidCsrfRequest(request)) return apiError("Invalid CSRF origin", 403);
@@ -19,6 +25,7 @@ export async function POST(request: Request) {
     if (!rate.success) return apiError("Too many requests", 429);
 
     const body = await request.json();
+    const locale = typeof body?.locale === "string" ? body.locale : "en";
     const parsed = registerSchema.safeParse(body);
     if (!parsed.success) return apiError(parsed.error.issues[0]?.message || "Invalid input", 422);
 
@@ -28,10 +35,7 @@ export async function POST(request: Request) {
     const email = parsed.data.email.toLowerCase().trim();
     const exists = await prisma.user.findUnique({ where: { email } });
     if (exists) {
-      return Response.json(
-        { success: true, message: "If this email can be registered, the account is ready to sign in." },
-        { status: 201 }
-      );
+      return apiError(getEmailExistsMessage(locale), 409);
     }
 
     const user = await prisma.user.create({

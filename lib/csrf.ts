@@ -1,18 +1,24 @@
 export function isValidCsrfRequest(request: Request) {
   if (["GET", "HEAD", "OPTIONS"].includes(request.method)) return true;
 
+  const isProd = process.env.NODE_ENV === "production";
   const host = request.headers.get("host");
-  if (!host) return false;
 
   const allowedOrigins = new Set<string>();
-  allowedOrigins.add(`https://${host}`);
-  allowedOrigins.add(`http://${host}`);
 
-  if (process.env.NEXT_PUBLIC_APP_URL) {
-    allowedOrigins.add(process.env.NEXT_PUBLIC_APP_URL);
+  for (const value of [process.env.NEXT_PUBLIC_APP_URL, process.env.NEXTAUTH_URL]) {
+    if (!value) continue;
+    try {
+      allowedOrigins.add(new URL(value).origin);
+    } catch {
+      // ignore malformed env values
+    }
   }
-  if (process.env.NEXTAUTH_URL) {
-    allowedOrigins.add(process.env.NEXTAUTH_URL);
+
+  // In local/dev we allow host-based origins for convenience.
+  if (!isProd && host) {
+    allowedOrigins.add(`https://${host}`);
+    allowedOrigins.add(`http://${host}`);
   }
 
   const fetchSite = request.headers.get("sec-fetch-site");

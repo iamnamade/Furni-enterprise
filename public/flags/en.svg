@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40" role="img" aria-label="United States flag">
+  <rect width="60" height="40" fill="#b22234"/>
+  <g fill="#fff">
+    <rect y="3" width="60" height="3"/>
+    <rect y="9" width="60" height="3"/>
+    <rect y="15" width="60" height="3"/>
+    <rect y="21" width="60" height="3"/>
+    <rect y="27" width="60" height="3"/>
+    <rect y="33" width="60" height="3"/>
+  </g>
+  <rect width="24" height="21" fill="#3c3b6e"/>
+</svg>

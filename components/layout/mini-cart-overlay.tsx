@@ -1,9 +1,11 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
-import { Minus, Plus, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { AnimatePresence, motion } from "@/lib/motion";
+import { Heart, Minus, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/utils";
 
@@ -26,6 +28,8 @@ type MiniCartOverlayProps = {
   decreaseLabel: string;
   increaseLabel: string;
   removeLabel: string;
+  continueShoppingLabel: string;
+  favoritesLabel: string;
   onClose: () => void;
   onRemove: (productId: string) => void;
   onUpdateQty: (productId: string, quantity: number) => void;
@@ -44,22 +48,28 @@ export function MiniCartOverlay({
   decreaseLabel,
   increaseLabel,
   removeLabel,
+  continueShoppingLabel,
+  favoritesLabel,
   onClose,
   onRemove,
   onUpdateQty
 }: MiniCartOverlayProps) {
-  const isKa = locale === "ka";
-  const emptyTitle = isKa ? "თქვენი კალათა ცარიელია" : emptyLabel;
-  const continueShoppingLabel = isKa ? "გააგრძელე ყიდვა" : "Continue shopping";
+  const [mounted, setMounted] = useState(false);
 
-  return (
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  const overlay = (
     <AnimatePresence>
       {open ? (
         <>
           <motion.button
             type="button"
             aria-label="Close mini cart overlay"
-            className="fixed inset-0 z-[70] bg-black/45 backdrop-blur-[2px]"
+            className="fixed inset-0 z-[180] bg-black/50 backdrop-blur-[2px]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -70,7 +80,7 @@ export function MiniCartOverlay({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="fixed inset-y-0 right-0 z-[80] flex w-[88vw] flex-col overflow-hidden border-l border-[#2d4f40] bg-[#1E3A2F] text-[#f5f5ef] shadow-[0_20px_70px_rgba(0,0,0,0.4)] sm:w-[400px] md:w-[450px] lg:w-[min(40vw,550px)]"
+            className="fixed inset-y-0 right-0 z-[190] flex w-[90vw] flex-col overflow-hidden border-l border-[#2d4f40] bg-[#1E3A2F] text-[#f5f5ef] shadow-[0_20px_70px_rgba(0,0,0,0.4)] sm:w-[430px] md:w-[500px] lg:w-[560px] xl:w-[620px]"
             role="dialog"
             aria-label={title}
           >
@@ -89,7 +99,7 @@ export function MiniCartOverlay({
             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-6 py-5 lg:px-8">
               {items.length === 0 ? (
                 <div className="space-y-4 rounded-2xl border border-[#3f6151] bg-[#264538] p-5">
-                  <p className="text-base font-semibold">{emptyTitle}</p>
+                  <p className="text-base font-semibold">{emptyLabel}</p>
                   <Link href={`/${locale}/shop`} onClick={onClose}>
                     <Button className="h-11 w-full bg-[#F5E6CA] text-[#1E3A2F] hover:bg-[#e9d8b7]">{continueShoppingLabel}</Button>
                   </Link>
@@ -101,7 +111,7 @@ export function MiniCartOverlay({
                     className="grid grid-cols-[100px_1fr_auto] items-center gap-4 rounded-2xl border border-[#3b5c4c] bg-[#254336] p-4"
                   >
                     <div className="overflow-hidden rounded-xl">
-                      <Image src={item.imageUrl} alt={item.name} width={100} height={100} className="h-[100px] w-[100px] object-cover" />
+                      <Image src={item.imageUrl} alt={item.name} width={100} height={100} sizes="100px" className="h-[100px] w-[100px] object-cover" />
                     </div>
 
                     <div className="min-w-0">
@@ -146,7 +156,7 @@ export function MiniCartOverlay({
                 <span className="opacity-80">{subtotalLabel}</span>
                 <span className="text-xl font-semibold text-[#F5E6CA]">{currency(subtotal)}</span>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                 <Link href={`/${locale}/cart`} onClick={onClose}>
                   <Button variant="secondary" className="h-11 w-full border border-[#F5E6CA] bg-[#2d4a3e] text-[#F5E6CA] hover:bg-[#355648]">
                     {viewCartLabel}
@@ -155,6 +165,12 @@ export function MiniCartOverlay({
                 <Link href={`/${locale}/checkout`} onClick={onClose}>
                   <Button className="h-11 w-full bg-[#F5E6CA] text-[#1E3A2F] hover:bg-[#e9d8b7]">{checkoutLabel}</Button>
                 </Link>
+                <Link href={`/${locale}/favorites`} onClick={onClose}>
+                  <Button variant="secondary" className="h-11 w-full border border-[#F5E6CA] bg-[#1f3a30] text-[#F5E6CA] hover:bg-[#2b4a3d]">
+                    <Heart className="mr-2 h-4 w-4" />
+                    {favoritesLabel}
+                  </Button>
+                </Link>
               </div>
             </div>
           </motion.aside>
@@ -162,4 +178,6 @@ export function MiniCartOverlay({
       ) : null}
     </AnimatePresence>
   );
+
+  return createPortal(overlay, document.body);
 }

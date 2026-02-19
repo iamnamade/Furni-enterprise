@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 export async function requireUser(locale = "ka") {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
-    redirect(`/${locale}/login`);
+    redirect(`/${locale}/auth`);
   }
   return session.user;
 }

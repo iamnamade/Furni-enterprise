@@ -1,7 +1,6 @@
 import "./globals.css";
 import { ReactNode } from "react";
 import type { Metadata } from "next";
-import Script from "next/script";
 import { cookies } from "next/headers";
 import { Inter } from "next/font/google";
 import { defaultLocale, locales } from "@/lib/i18n";
@@ -44,10 +43,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
-        {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ? (
-          <Script src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`} strategy="afterInteractive" />
-        ) : null}
+      <body suppressHydrationWarning className={`${inter.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>

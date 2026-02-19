@@ -35,7 +35,7 @@ export default async function middleware(request: NextRequest) {
   });
 
   if (!token?.sub) {
-    return NextResponse.redirect(new URL(`/${locale}/login`, request.url));
+    return NextResponse.redirect(new URL(`/${locale}/auth`, request.url));
   }
 
   if (needsAdmin && token.role !== "ADMIN") {

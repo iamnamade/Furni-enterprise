@@ -1,25 +1,35 @@
 import Link from "next/link";
 import { Headphones, RotateCcw, ShieldCheck, Star, Truck } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { getAllProducts, getFeaturedProducts, getCategories } from "@/lib/catalog";
+import { getCategories, getFeaturedProducts, getNewestProducts } from "@/lib/catalog";
 import { ProductCard } from "@/components/shop/product-card";
 import { Reveal } from "@/components/shop/reveal";
 import { TestimonialCarousel } from "@/components/shop/testimonial-carousel";
+import { getDiscountView } from "@/lib/pricing";
 
 export default async function HomePage({ params }: { params: { locale: string } }) {
-  const t = await getTranslations("home");
-  const [featured, allProducts, categories] = await Promise.all([getFeaturedProducts(), getAllProducts(), getCategories()]);
-  const displayProducts = (featured.length ? featured : allProducts.slice(0, 8)).slice(0, 8);
+  const [t, featured, newestProducts, categories] = await Promise.all([
+    getTranslations("home"),
+    getFeaturedProducts(8),
+    getNewestProducts(8),
+    getCategories()
+  ]);
+  const displayProducts = (featured.length ? featured : newestProducts).slice(0, 8);
 
-  const featuredCards = displayProducts.map((product) => ({
-    id: product.id,
-    slug: product.slug,
-    name: product.name,
-    price: Number(product.price),
-    imageUrl: product.imageUrl
-  }));
+  const featuredCards = displayProducts.map((product) => {
+    const discountView = getDiscountView(Number(product.price), product.discountPct);
+    return {
+      id: product.id,
+      slug: product.slug,
+      name: product.name,
+      price: discountView.price,
+      originalPrice: discountView.originalPrice,
+      discountLabel: discountView.discountLabel,
+      imageUrl: product.imageUrl
+    };
+  });
 
-  const saleSource = allProducts.length ? allProducts : displayProducts;
+  const saleSource = newestProducts.length ? newestProducts : displayProducts;
   const saleProducts = saleSource.slice(0, 4).map((product, idx) => {
     const discounts = [20, 35, 15, 25];
     const discount = discounts[idx % discounts.length];
@@ -61,7 +71,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
     <div className="space-y-20 pb-14">
       <Reveal>
         <section className="lux-hero-glow relative overflow-hidden rounded-[2rem] border bg-[linear-gradient(135deg,rgba(255,255,255,0.12),rgba(255,255,255,0.02))] px-6 py-14 text-center shadow-[0_30px_80px_rgba(0,0,0,0.2)] dark:shadow-[0_30px_80px_rgba(0,0,0,0.5)] sm:px-10 md:py-20">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_8%,rgba(200,169,126,0.22),transparent_34%),radial-gradient(circle_at_86%_22%,rgba(255,255,255,0.10),transparent_36%)] dark:bg-[radial-gradient(circle_at_20%_8%,rgba(247,231,206,0.22),transparent_34%),radial-gradient(circle_at_86%_22%,rgba(255,255,255,0.09),transparent_36%)] animate-[driftGradient_14s_ease-in-out_infinite_alternate]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_8%,rgba(200,169,126,0.22),transparent_34%),radial-gradient(circle_at_86%_22%,rgba(255,255,255,0.10),transparent_36%)] dark:bg-[radial-gradient(circle_at_20%_8%,rgba(247,231,206,0.22),transparent_34%),radial-gradient(circle_at_86%_22%,rgba(255,255,255,0.09),transparent_36%)]" />
           <p className="relative text-xs uppercase tracking-[0.24em] text-muted">{t("kicker")}</p>
           <h1 className="relative mx-auto mt-5 max-w-5xl text-5xl font-extrabold tracking-[-0.045em] text-[color:var(--foreground)] sm:text-6xl lg:text-7xl">
             {t("title")}

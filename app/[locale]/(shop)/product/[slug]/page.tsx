@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ProductClient from "./product-client";
+import { localizeCategoryName, localizeProductDescription, localizeProductName } from "@/lib/product-i18n";
+import { getDiscountView } from "@/lib/pricing";
 
 type Props = {
   params: { slug: string; locale: string };
@@ -10,20 +12,22 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = await prisma.product.findUnique({ where: { slug: params.slug } });
   if (!product) return {};
+  const localizedName = localizeProductName(product.slug, product.name, params.locale);
+  const localizedDescription = localizeProductDescription(product.slug, product.description, params.locale);
 
   return {
-    title: product.name,
-    description: product.description,
+    title: localizedName,
+    description: localizedDescription,
     openGraph: {
-      title: product.name,
-      description: product.description,
+      title: localizedName,
+      description: localizedDescription,
       images: [product.imageUrl],
       type: "website"
     },
     twitter: {
       card: "summary_large_image",
-      title: product.name,
-      description: product.description,
+      title: localizedName,
+      description: localizedDescription,
       images: [product.imageUrl]
     }
   };
@@ -47,26 +51,31 @@ export default async function ProductDetailsPage({ params }: Props) {
   });
 
   const relatedProducts = relatedRaw.map((item) => ({
+    ...getDiscountView(Number(item.price), item.discountPct),
     id: item.id,
     slug: item.slug,
-    name: item.name,
-    price: Number(item.price),
+    name: localizeProductName(item.slug, item.name, params.locale),
     imageUrl: item.imageUrl
   }));
 
   const gallery = [product.imageUrl];
 
+  const localizedName = localizeProductName(product.slug, product.name, params.locale);
+  const localizedDescription = localizeProductDescription(product.slug, product.description, params.locale);
+  const localizedCategory = localizeCategoryName(product.category.slug, product.category.name, params.locale);
+  const discountView = getDiscountView(Number(product.price), product.discountPct);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: product.name,
+    name: localizedName,
     image: [product.imageUrl],
-    description: product.description,
+    description: localizedDescription,
     brand: "Furni Enterprise",
     offers: {
       "@type": "Offer",
       priceCurrency: "USD",
-      price: Number(product.price),
+      price: discountView.price,
       availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
     }
   };
@@ -78,12 +87,16 @@ export default async function ProductDetailsPage({ params }: Props) {
         locale={params.locale}
         product={{
           productId: product.id,
-          name: product.name,
+          name: localizedName,
+          slug: product.slug,
           imageUrl: product.imageUrl,
-          price: Number(product.price),
+          price: discountView.price,
+          originalPrice: discountView.originalPrice,
+          discountPct: discountView.discountPct,
           stock: product.stock,
-          category: product.category.name,
-          description: product.description
+          category: localizedCategory,
+          categorySlug: product.category.slug,
+          description: localizedDescription
         }}
         gallery={gallery}
         relatedProducts={relatedProducts}
