@@ -62,12 +62,9 @@ export function Navbar({ locale, categories }: NavbarProps) {
   const [desktopCategoryOpen, setDesktopCategoryOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const closeCartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const accountRef = useRef<HTMLDivElement | null>(null);
   const desktopCategoryRef = useRef<HTMLDivElement | null>(null);
   const desktopCategoryButtonRef = useRef<HTMLButtonElement | null>(null);
-  const prevCountRef = useRef(count);
-  const didInitCartEffectRef = useRef(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -79,28 +76,6 @@ export function Navbar({ locale, categories }: NavbarProps) {
       document.body.style.overflow = "";
     };
   }, [open]);
-
-  useEffect(() => {
-    if (!didInitCartEffectRef.current) {
-      didInitCartEffectRef.current = true;
-      prevCountRef.current = count;
-      return;
-    }
-
-    const prev = prevCountRef.current;
-    if (count > prev) {
-      setCartOpen(true);
-      if (closeCartTimeoutRef.current) clearTimeout(closeCartTimeoutRef.current);
-      closeCartTimeoutRef.current = setTimeout(() => setCartOpen(false), 3200);
-    }
-    prevCountRef.current = count;
-  }, [count]);
-
-  useEffect(() => {
-    return () => {
-      if (closeCartTimeoutRef.current) clearTimeout(closeCartTimeoutRef.current);
-    };
-  }, []);
 
   useEffect(() => {
     function onClickOutside(event: MouseEvent) {
