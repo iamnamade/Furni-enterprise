@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { sendOrderEmail } from "@/lib/email";
+import { isValidCuid } from "@/lib/request-guard";
 
 export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
       const session = event.data.object as Stripe.Checkout.Session;
       const orderId = session.metadata?.orderId;
 
-      if (orderId) {
+      if (orderId && isValidCuid(orderId)) {
         const order = await prisma.order.update({
           where: { id: orderId },
           data: { status: "PAID" },

@@ -27,6 +27,19 @@
   --control-bg: rgba(16, 44, 38, 0.06);
   --control-hover: rgba(16, 44, 38, 0.12);
   --control-border: rgba(16, 44, 38, 0.2);
+  --cart-scrim: rgba(16, 44, 38, 0.44);
+  --cart-panel-bg: #f6e9d3;
+  --cart-panel-fg: #102c26;
+  --cart-panel-border: rgba(16, 44, 38, 0.18);
+  --cart-list-bg: rgba(255, 255, 255, 0.46);
+  --cart-item-bg: rgba(255, 255, 255, 0.78);
+  --cart-item-border: rgba(16, 44, 38, 0.16);
+  --cart-muted: rgba(16, 44, 38, 0.74);
+  --cart-price: #102c26;
+  --cart-control-bg: rgba(16, 44, 38, 0.06);
+  --cart-control-border: rgba(16, 44, 38, 0.22);
+  --cart-footer-bg: rgba(246, 233, 211, 0.94);
+  --cart-shadow: 0 22px 68px rgba(16, 44, 38, 0.34);
   --gradient:
     radial-gradient(900px circle at 10% -12%, rgba(16, 44, 38, 0.08), transparent 44%),
     radial-gradient(900px circle at 88% 10%, rgba(200, 169, 126, 0.14), transparent 42%),
@@ -58,6 +71,19 @@
   --control-bg: rgba(255, 255, 255, 0.06);
   --control-hover: rgba(255, 255, 255, 0.14);
   --control-border: rgba(255, 255, 255, 0.18);
+  --cart-scrim: rgba(0, 0, 0, 0.62);
+  --cart-panel-bg: #1e3a2f;
+  --cart-panel-fg: #f5f5ef;
+  --cart-panel-border: rgba(245, 245, 239, 0.14);
+  --cart-list-bg: rgba(22, 49, 40, 0.88);
+  --cart-item-bg: #254336;
+  --cart-item-border: #3b5c4c;
+  --cart-muted: rgba(245, 245, 239, 0.75);
+  --cart-price: #f5e6ca;
+  --cart-control-bg: #1b342b;
+  --cart-control-border: #577a68;
+  --cart-footer-bg: rgba(25, 49, 38, 0.96);
+  --cart-shadow: 0 24px 72px rgba(0, 0, 0, 0.5);
   --gradient:
     radial-gradient(1000px circle at 14% -18%, rgba(247, 231, 206, 0.16), transparent 44%),
     radial-gradient(880px circle at 88% 8%, rgba(255, 255, 255, 0.06), transparent 38%),

@@ -5,7 +5,7 @@ import { registerSchema } from "@/lib/validators";
 import { isValidCsrfRequest } from "@/lib/csrf";
 import { verifyRecaptchaToken } from "@/lib/captcha";
 import { applyRateLimitByKey } from "@/lib/rate-limit";
-import { isPayloadTooLarge } from "@/lib/request-guard";
+import { getClientIp, hasJsonContentType, isPayloadTooLarge } from "@/lib/request-guard";
 
 function getEmailExistsMessage(locale: string) {
   if (locale === "ka") return "ამ ელფოსტით უკვე არსებობს ანგარიში.";
@@ -16,11 +16,10 @@ function getEmailExistsMessage(locale: string) {
 export async function POST(request: Request) {
   try {
     if (!isValidCsrfRequest(request)) return apiError("Invalid CSRF origin", 403);
+    if (!hasJsonContentType(request)) return apiError("Expected application/json", 415);
     if (isPayloadTooLarge(request, 32 * 1024)) return apiError("Payload too large", 413);
 
-    const ip = (request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown")
-      .split(",")[0]
-      .trim();
+    const ip = getClientIp(request);
     const rate = await applyRateLimitByKey(`register:${ip}`, 8, 300);
     if (!rate.success) return apiError("Too many requests", 429);
 

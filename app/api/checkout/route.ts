@@ -7,16 +7,16 @@ import { checkoutSchema } from "@/lib/validators";
 import { z } from "zod";
 import { isValidCsrfRequest } from "@/lib/csrf";
 import { applyRateLimitByKey } from "@/lib/rate-limit";
-import { isPayloadTooLarge } from "@/lib/request-guard";
+import { getClientIp, hasJsonContentType, isPayloadTooLarge } from "@/lib/request-guard";
+import { locales } from "@/lib/i18n";
 
 export async function POST(request: Request) {
   try {
     if (!isValidCsrfRequest(request)) return apiError("Invalid CSRF origin", 403);
+    if (!hasJsonContentType(request)) return apiError("Expected application/json", 415);
     if (isPayloadTooLarge(request, 256 * 1024)) return apiError("Payload too large", 413);
 
-    const ip = (request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown")
-      .split(",")[0]
-      .trim();
+    const ip = getClientIp(request);
     const rate = await applyRateLimitByKey(`checkout:${ip}`, 20, 300);
     if (!rate.success) return apiError("Too many requests", 429);
 
@@ -25,12 +25,12 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const checkoutPayloadSchema = checkoutSchema.extend({
-      locale: z.string().min(2)
+      locale: z.enum(locales)
     });
     const parsed = checkoutPayloadSchema.safeParse(body);
 
     if (!parsed.success) {
-      return apiError(parsed.error.message, 422);
+      return apiError(parsed.error.issues[0]?.message || "Invalid input", 422);
     }
     const payload = parsed.data;
 
@@ -39,10 +39,13 @@ export async function POST(request: Request) {
     });
 
     if (products.length === 0) return apiError("Cart is empty", 422);
+    const productById = new Map(products.map((product) => [product.id, product]));
+    if (productById.size !== new Set(payload.cartItems.map((item) => item.productId)).size) {
+      return apiError("Cart contains invalid products", 422);
+    }
 
     const lineItems = payload.cartItems.map((item) => {
-      const product = products.find((p) => p.id === item.productId);
-      if (!product) throw new Error("Invalid product in cart");
+      const product = productById.get(item.productId)!;
 
       return {
         price_data: {
@@ -58,7 +61,7 @@ export async function POST(request: Request) {
     });
 
     const total = payload.cartItems.reduce((acc, item) => {
-      const p = products.find((x) => x.id === item.productId);
+      const p = productById.get(item.productId);
       return acc + Number(p?.price || 0) * item.quantity;
     }, 0);
 
@@ -75,7 +78,7 @@ export async function POST(request: Request) {
         shippingZip: payload.shippingZip,
         orderItems: {
           create: payload.cartItems.map((item) => {
-            const product = products.find((p) => p.id === item.productId)!;
+            const product = productById.get(item.productId)!;
             return {
               productId: product.id,
               price: product.price,

@@ -2,15 +2,20 @@ import { z } from "zod";
 
 const passwordRule =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\S]{8,}$/;
+const slugRule = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+const nameField = z.string().trim().min(2).max(120);
+const slugField = z.string().trim().toLowerCase().min(2).max(90).regex(slugRule, "Invalid slug format.");
+const descriptionField = z.string().trim().min(10).max(4000);
 
 export const loginSchema = z.object({
-  email: z.string().email(),
+  email: z.string().trim().email().max(254),
   password: z.string().min(8),
   captchaToken: z.string().min(10).optional()
 });
 
 export const registerSchema = loginSchema.extend({
-  name: z.string().min(2).max(80),
+  name: nameField.max(80),
   password: z
     .string()
     .min(8)
@@ -19,7 +24,7 @@ export const registerSchema = loginSchema.extend({
 });
 
 export const forgotPasswordSchema = z.object({
-  email: z.string().email(),
+  email: z.string().trim().email().max(254),
   captchaToken: z.string().min(10)
 });
 
@@ -36,36 +41,36 @@ export const resetPasswordRequestSchema = resetPasswordSchema.extend({
 });
 
 export const productSchema = z.object({
-  name: z.string().min(2),
-  slug: z.string().min(2),
-  description: z.string().min(10),
+  name: nameField,
+  slug: slugField,
+  description: descriptionField,
   price: z.coerce.number().positive(),
-  imageUrl: z.string().url(),
+  imageUrl: z.string().trim().url().max(2048),
   featured: z.coerce.boolean().optional().default(false),
   discountPct: z.coerce.number().int().min(0).max(90).optional().default(0),
-  stock: z.coerce.number().int().nonnegative(),
-  categoryId: z.string().min(1)
+  stock: z.coerce.number().int().min(0).max(100000),
+  categoryId: z.string().cuid()
 });
 
 export const categorySchema = z.object({
-  name: z.string().min(2),
-  slug: z.string().min(2),
-  description: z.string().optional()
+  name: nameField.max(80),
+  slug: slugField,
+  description: z.string().trim().max(1000).optional()
 });
 
 export const checkoutSchema = z.object({
-  shippingName: z.string().min(2),
-  shippingEmail: z.string().email(),
-  shippingAddress: z.string().min(5),
-  shippingCity: z.string().min(2),
-  shippingCountry: z.string().min(2),
-  shippingZip: z.string().min(2),
+  shippingName: z.string().trim().min(2).max(120),
+  shippingEmail: z.string().trim().email().max(254),
+  shippingAddress: z.string().trim().min(5).max(220),
+  shippingCity: z.string().trim().min(2).max(80),
+  shippingCountry: z.string().trim().min(2).max(80),
+  shippingZip: z.string().trim().min(2).max(20),
   cartItems: z.array(
     z.object({
-      productId: z.string().min(1),
-      quantity: z.number().int().positive()
+      productId: z.string().cuid(),
+      quantity: z.number().int().min(1).max(99)
     })
-  )
+  ).min(1).max(100)
 });
 
 export const adminOrderStatusSchema = z.object({
@@ -74,4 +79,8 @@ export const adminOrderStatusSchema = z.object({
 
 export const adminUserRoleSchema = z.object({
   role: z.enum(["USER", "ADMIN"])
+});
+
+export const idParamSchema = z.object({
+  id: z.string().cuid()
 });

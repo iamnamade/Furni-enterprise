@@ -5,21 +5,22 @@ import { apiError, parseError } from "@/lib/errors";
 import { z } from "zod";
 import { isValidCsrfRequest } from "@/lib/csrf";
 import { applyRateLimitByKey } from "@/lib/rate-limit";
+import { getClientIp, hasJsonContentType, isPayloadTooLarge } from "@/lib/request-guard";
 
 const cartSyncSchema = z.array(
   z.object({
-    productId: z.string().min(1),
-    quantity: z.number().int().positive()
+    productId: z.string().cuid(),
+    quantity: z.number().int().min(1).max(99)
   })
-);
+).max(100);
 
 export async function POST(request: Request) {
   try {
     if (!isValidCsrfRequest(request)) return apiError("Invalid CSRF origin", 403);
+    if (!hasJsonContentType(request)) return apiError("Expected application/json", 415);
+    if (isPayloadTooLarge(request, 128 * 1024)) return apiError("Payload too large", 413);
 
-    const ip = (request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown")
-      .split(",")[0]
-      .trim();
+    const ip = getClientIp(request);
     const rate = await applyRateLimitByKey(`cart-sync:${ip}`, 60, 60);
     if (!rate.success) return apiError("Too many requests", 429);
 
@@ -28,13 +29,33 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const parsed = cartSyncSchema.safeParse(body);
-    if (!parsed.success) return apiError(parsed.error.message, 422);
+    if (!parsed.success) return apiError(parsed.error.issues[0]?.message || "Invalid input", 422);
+
+    const deduped = new Map<string, number>();
+    for (const item of parsed.data) {
+      const currentQty = deduped.get(item.productId) ?? 0;
+      deduped.set(item.productId, Math.min(99, currentQty + item.quantity));
+    }
+
+    const items = Array.from(deduped.entries()).map(([productId, quantity]) => ({
+      productId,
+      quantity
+    }));
+
+    if (items.length > 0) {
+      const validProductCount = await prisma.product.count({
+        where: { id: { in: items.map((item) => item.productId) } }
+      });
+      if (validProductCount !== items.length) {
+        return apiError("Cart contains invalid products", 422);
+      }
+    }
 
     await prisma.$transaction(async (tx) => {
       await tx.cartItem.deleteMany({ where: { userId: session.user.id } });
-      if (parsed.data.length > 0) {
+      if (items.length > 0) {
         await tx.cartItem.createMany({
-          data: parsed.data.map((item) => ({
+          data: items.map((item) => ({
             userId: session.user.id,
             productId: item.productId,
             quantity: item.quantity

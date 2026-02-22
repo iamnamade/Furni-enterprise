@@ -5,6 +5,7 @@ import { requireAdminApi } from "@/lib/admin-api";
 import { isValidCsrfRequest } from "@/lib/csrf";
 import { cacheDel } from "@/lib/redis";
 import { Prisma } from "@prisma/client";
+import { hasJsonContentType, isPayloadTooLarge } from "@/lib/request-guard";
 
 function baseSlug(slug: string) {
   return slug.replace(/-\d+$/, "");
@@ -60,6 +61,8 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     if (!isValidCsrfRequest(request)) return apiError("Invalid CSRF origin", 403);
+    if (!hasJsonContentType(request)) return apiError("Expected application/json", 415);
+    if (isPayloadTooLarge(request, 64 * 1024)) return apiError("Payload too large", 413);
 
     const auth = await requireAdminApi(request);
     if (auth.error) return auth.error;

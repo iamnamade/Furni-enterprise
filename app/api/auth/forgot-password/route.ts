@@ -8,7 +8,7 @@ import { forgotPasswordSchema } from "@/lib/validators";
 import { createSecureToken } from "@/lib/security";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { defaultLocale, locales } from "@/lib/i18n";
-import { isPayloadTooLarge } from "@/lib/request-guard";
+import { getClientIp, hasJsonContentType, isPayloadTooLarge } from "@/lib/request-guard";
 
 const requestSchema = forgotPasswordSchema.extend({
   locale: z.enum(locales).optional()
@@ -17,11 +17,10 @@ const requestSchema = forgotPasswordSchema.extend({
 export async function POST(request: Request) {
   try {
     if (!isValidCsrfRequest(request)) return apiError("Invalid CSRF origin", 403);
+    if (!hasJsonContentType(request)) return apiError("Expected application/json", 415);
     if (isPayloadTooLarge(request, 32 * 1024)) return apiError("Payload too large", 413);
 
-    const ip = (request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown")
-      .split(",")[0]
-      .trim();
+    const ip = getClientIp(request);
     const ipRate = await applyRateLimitByKey(`forgot-password:${ip}`, 8, 300);
     if (!ipRate.success) return apiError("Too many requests", 429);
 

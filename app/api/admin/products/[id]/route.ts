@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { apiError, parseError } from "@/lib/errors";
-import { productSchema } from "@/lib/validators";
+import { idParamSchema, productSchema } from "@/lib/validators";
 import { requireAdminApi } from "@/lib/admin-api";
 import { isValidCsrfRequest } from "@/lib/csrf";
 import { cacheDel } from "@/lib/redis";
+import { hasJsonContentType, isPayloadTooLarge } from "@/lib/request-guard";
 
 type Params = {
   params: { id: string };
@@ -12,16 +13,21 @@ type Params = {
 export async function PUT(request: Request, { params }: Params) {
   try {
     if (!isValidCsrfRequest(request)) return apiError("Invalid CSRF origin", 403);
+    if (!hasJsonContentType(request)) return apiError("Expected application/json", 415);
+    if (isPayloadTooLarge(request, 64 * 1024)) return apiError("Payload too large", 413);
 
     const auth = await requireAdminApi(request);
     if (auth.error) return auth.error;
+
+    const idParsed = idParamSchema.safeParse(params);
+    if (!idParsed.success) return apiError("Invalid product id", 422);
 
     const body = await request.json();
     const parsed = productSchema.partial().safeParse(body);
     if (!parsed.success) return apiError(parsed.error.issues[0]?.message || "Invalid input", 422);
 
     const product = await prisma.product.update({
-      where: { id: params.id },
+      where: { id: idParsed.data.id },
       data: parsed.data
     });
 
@@ -42,7 +48,10 @@ export async function DELETE(request: Request, { params }: Params) {
     const auth = await requireAdminApi(request);
     if (auth.error) return auth.error;
 
-    await prisma.product.delete({ where: { id: params.id } });
+    const idParsed = idParamSchema.safeParse(params);
+    if (!idParsed.success) return apiError("Invalid product id", 422);
+
+    await prisma.product.delete({ where: { id: idParsed.data.id } });
     await cacheDel("products:*");
     await cacheDel("featured:*");
     await cacheDel("category:*");

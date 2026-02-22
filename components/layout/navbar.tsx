@@ -71,11 +71,11 @@ export function Navbar({ locale, categories }: NavbarProps) {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    document.body.style.overflow = open || cartOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [open]);
+  }, [open, cartOpen]);
 
   useEffect(() => {
     function onClickOutside(event: MouseEvent) {
