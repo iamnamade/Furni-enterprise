@@ -2,14 +2,17 @@ import Link from "next/link";
 import { Headphones, RotateCcw, ShieldCheck, Star, Truck } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getCategories, getFeaturedProducts, getNewestProducts } from "@/lib/catalog";
-import { ProductCard } from "@/components/shop/product-card";
+import { ProductCardStatic } from "@/components/shop/product-card-static";
 import { Reveal } from "@/components/shop/reveal";
 import { TestimonialCarousel } from "@/components/shop/testimonial-carousel";
 import { getDiscountView } from "@/lib/pricing";
 
+export const revalidate = 120;
+
 export default async function HomePage({ params }: { params: { locale: string } }) {
-  const [t, featured, newestProducts, categories] = await Promise.all([
+  const [t, tProduct, featured, newestProducts, categories] = await Promise.all([
     getTranslations("home"),
+    getTranslations("product"),
     getFeaturedProducts(8),
     getNewestProducts(8),
     getCategories()
@@ -119,7 +122,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {featuredCards.map((product) => (
-              <ProductCard key={product.id} locale={params.locale} product={product} />
+              <ProductCardStatic key={product.id} locale={params.locale} product={product} detailsLabel={tProduct("details")} />
             ))}
           </div>
         </section>
@@ -140,7 +143,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {saleProducts.map((product) => (
-              <ProductCard key={`${product.id}-sale`} locale={params.locale} product={product} />
+              <ProductCardStatic key={`${product.id}-sale`} locale={params.locale} product={product} detailsLabel={tProduct("details")} />
             ))}
           </div>
         </section>
@@ -231,10 +234,12 @@ export default async function HomePage({ params }: { params: { locale: string } 
           <div className="pointer-events-none absolute -bottom-20 -right-16 h-56 w-56 rounded-full bg-[#c8a97e]/35 blur-3xl dark:bg-white/10" />
           <h2 className="section-title relative">{t("newsletterTitle")}</h2>
           <p className="relative mx-auto mt-3 max-w-2xl text-sm text-muted">{t("newsletterSubtitle")}</p>
-          <form className="relative mx-auto mt-6 flex max-w-md gap-2 rounded-full border bg-[color:var(--surface)]/90 p-2 backdrop-blur-2xl">
+          <form className="relative mx-auto mt-6 flex max-w-md gap-2 rounded-full border bg-[color:var(--surface)]/90 p-2 backdrop-blur-2xl" aria-label={t("newsletterTitle")}>
             <input
               required
               type="email"
+              aria-label="Email address"
+              autoComplete="email"
               placeholder="you@example.com"
               className="h-11 flex-1 rounded-full bg-transparent px-4 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--muted)] focus:outline-none"
             />

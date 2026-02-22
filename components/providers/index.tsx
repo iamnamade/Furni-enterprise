@@ -7,7 +7,7 @@ import { Toaster } from "@/components/providers/toaster";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <SessionProvider>
+    <SessionProvider refetchOnWindowFocus={false} refetchWhenOffline={false}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         {children}
         <Toaster />

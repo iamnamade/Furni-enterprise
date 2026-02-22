@@ -1,4 +1,5 @@
-﻿import { ReactNode } from "react";
+﻿import type { Metadata } from "next";
+import { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -14,12 +15,35 @@ type Props = {
   params: { locale: string };
 };
 
+export function generateStaticParams() {
+  return locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({ params }: Pick<Props, "params">): Promise<Metadata> {
+  if (!locales.includes(params.locale as (typeof locales)[number])) {
+    return {};
+  }
+
+  const languages = Object.fromEntries(locales.map((locale) => [locale, `/${locale}`]));
+
+  return {
+    alternates: {
+      canonical: `/${params.locale}`,
+      languages
+    }
+  };
+}
+
 export default async function LocaleLayout({ children, params }: Props) {
   if (!locales.includes(params.locale as (typeof locales)[number])) {
     notFound();
   }
 
-  const [messages, categories] = await Promise.all([getMessages(), getCategories()]);
+  const [messages, categories] = await Promise.all([
+    getMessages({ locale: params.locale }),
+    getCategories()
+  ]);
+
   const navCategories = categories
     .filter((category) => Boolean(CATEGORY_META_BY_SLUG[category.slug]))
     .map((category) => ({
@@ -41,4 +65,3 @@ export default async function LocaleLayout({ children, params }: Props) {
     </NextIntlClientProvider>
   );
 }
-
