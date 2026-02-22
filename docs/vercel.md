@@ -14,6 +14,9 @@ Set all variables from `.env.example`:
 - `UPSTASH_REDIS_URL=<Upstash TLS URL>`
 - `RESEND_API_KEY=<Resend API key>`
 - `FROM_EMAIL=<verified sender>`
+- `NEXT_PUBLIC_APP_URL=https://yourdomain.com`
+- `NEXT_PUBLIC_RECAPTCHA_SITE_KEY=<Google reCAPTCHA site key>`
+- `RECAPTCHA_SECRET_KEY=<Google reCAPTCHA secret key>`
 - `CLOUDINARY_URL=<Cloudinary URL if used>`
 
 ## Deploy Steps
