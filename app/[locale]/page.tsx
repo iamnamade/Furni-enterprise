@@ -6,6 +6,7 @@ import { ProductCardStatic } from "@/components/shop/product-card-static";
 import { Reveal } from "@/components/shop/reveal";
 import { TestimonialCarousel } from "@/components/shop/testimonial-carousel";
 import { getDiscountView } from "@/lib/pricing";
+import { NewsletterSubscribeForm } from "@/components/newsletter/newsletter-subscribe-form";
 
 export const revalidate = 120;
 
@@ -234,22 +235,12 @@ export default async function HomePage({ params }: { params: { locale: string } 
           <div className="pointer-events-none absolute -bottom-20 -right-16 h-56 w-56 rounded-full bg-[#c8a97e]/35 blur-3xl dark:bg-white/10" />
           <h2 className="section-title relative">{t("newsletterTitle")}</h2>
           <p className="relative mx-auto mt-3 max-w-2xl text-sm text-muted">{t("newsletterSubtitle")}</p>
-          <form className="relative mx-auto mt-6 flex max-w-md gap-2 rounded-full border bg-[color:var(--surface)]/90 p-2 backdrop-blur-2xl" aria-label={t("newsletterTitle")}>
-            <input
-              required
-              type="email"
-              aria-label="Email address"
-              autoComplete="email"
-              placeholder="you@example.com"
-              className="h-11 flex-1 rounded-full bg-transparent px-4 text-sm text-[color:var(--foreground)] placeholder:text-[color:var(--muted)] focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="rounded-full bg-[color:var(--button-primary-bg)] px-6 text-sm font-semibold text-[color:var(--button-primary-fg)] shadow-[0_10px_30px_rgba(16,44,38,0.18)] transition hover:scale-[1.02]"
-            >
-              {t("subscribe")}
-            </button>
-          </form>
+          <NewsletterSubscribeForm
+            locale={params.locale}
+            formLabel={t("newsletterTitle")}
+            submitLabel={t("subscribe")}
+            variant="hero"
+          />
         </section>
       </Reveal>
     </div>

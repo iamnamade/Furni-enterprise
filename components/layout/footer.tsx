@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { CreditCard, Facebook, Instagram, Linkedin, ShieldCheck, Truck } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { NewsletterSubscribeForm } from "@/components/newsletter/newsletter-subscribe-form";
 import { BrandLogo } from "./brand-logo";
 
 export async function Footer({ locale }: { locale: string }) {
@@ -57,21 +56,16 @@ export async function Footer({ locale }: { locale: string }) {
           </Link>
         </div>
 
-        <form className="space-y-3" aria-label={tFooter("newsletter")}>
+        <div className="space-y-3">
           <p className="font-semibold">{tFooter("newsletter")}</p>
           <p className="text-sm text-[color:var(--footer-muted)]">{tFooter("newsletterDesc")}</p>
-          <div className="flex gap-2 rounded-2xl border border-[color:var(--footer-border)] bg-[color:var(--surface)] p-2 backdrop-blur-xl">
-            <Input
-              aria-label="Newsletter email"
-              placeholder="you@example.com"
-              type="email"
-              autoComplete="email"
-              required
-              className="border-0 bg-transparent"
-            />
-            <Button type="submit">{tFooter("join")}</Button>
-          </div>
-        </form>
+          <NewsletterSubscribeForm
+            locale={locale}
+            formLabel={tFooter("newsletter")}
+            submitLabel={tFooter("join")}
+            variant="footer"
+          />
+        </div>
       </div>
       <div className="border-t border-[color:var(--footer-border)] py-4 text-center text-xs text-[color:var(--footer-muted)]">
         Copyright {new Date().getFullYear()} {tCommon("brand")}. {tFooter("rights")}
